@@ -8,6 +8,20 @@
 char wbuf[10] ;	
 
 int
+is_empty (char hor, int ver)
+{
+	char pos[5] ;
+	snprintf(pos, 4, "%c%02d", hor, ver) ;
+
+	char status = get_stone_at(pos) ;
+
+	if (status == 'E')
+		return 1 ;
+	else 
+		return 0 ;
+}
+
+int
 main ()
 {
 	char ip[20] ;
@@ -46,11 +60,17 @@ main ()
 	srand(time(0x0)) ;
 
 	while (1) {
-		hor1 = (rand() % 19) + 'A' ;
-		ver1 = (rand() % 19) + 1 ;
+		do {
+			hor1 = (rand() % 19) + 'A' ;
+			hor1 += ('I' <= hor1) ? 1 : 0 ;
+			ver1 = (rand() % 19) + 1 ;
 			
-		hor2 = (rand() % 19) + 'A' ;
-		ver2 = (rand() % 19) + 1 ;
+			do {
+				hor2 = (rand() % 19) + 'A' ;
+				hor2 += ('I' <= hor2) ? 1 : 0 ;
+				ver2 = (rand() % 19) + 1 ;
+			} while (hor1 == hor2 && ver1 == ver2) ;
+		} while (is_empty(hor1, ver1) == 0 || is_empty(hor2, ver2) == 0) ;
 		
 		snprintf(wbuf, 10, "%c%02d:%c%02d", hor1, ver1, hor2, ver2) ;
 
