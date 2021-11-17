@@ -3,7 +3,7 @@
 #include <string.h>
 #include <time.h>
 
-#include "connsix.h"
+#include "../include/connsix.h"
 
 char wbuf[10] ;	
 
