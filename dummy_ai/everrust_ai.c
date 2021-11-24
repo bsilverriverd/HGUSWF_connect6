@@ -3,7 +3,8 @@
 #include <string.h>
 #include <time.h>
 
-#include "../include/connsix.h"
+#include "connsix.h"
+#include "board.h"
 
 char wbuf[10] ;	
 

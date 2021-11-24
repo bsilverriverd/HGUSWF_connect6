@@ -4,6 +4,7 @@ SRC_DIR=src
 OBJ_DIR=obj
 LIB_DIR=lib
 BIN_DIR=bin
+INC_DIR=include
 
 PGM=dummy_ai/everrust_ai.c
 BIN=$(BIN_DIR)/everrust_ai
@@ -24,13 +25,13 @@ connsix: $(LIB)
 dummy_ai: $(BIN)
 
 $(BIN): $(PGM) | $(LIB) $(BIN_DIR)
-	$(CC) $^ -o $@ $(LDLIBS)
+	$(CC) $^ -o $@ -I$(INC_DIR) $(LDLIBS)
 
 $(LIB): $(OBJ) | $(LIB_DIR)
 	ar $(ARFLAGS) $@ $^
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
-	$(CC) -c $< -o $@
+	$(CC) -c $< -o $@ -I$(INC_DIR)
 
 $(OBJ_DIR) $(LIB_DIR) $(BIN_DIR):
 	mkdir -p $@
