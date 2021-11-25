@@ -30,7 +30,6 @@ r_board_increase (board_t * board, int h, int v, int dir, int depth)
 void
 r_board_decrease (board_t * board, int h, int v, int dir, int depth, int weight)
 {
-	fprintf(stderr,"h=%d, v=%d, dir=%d, depth=%d, weight=%d\n",h,v,dir,depth,weight);
 	if (h < 0 || 19 <= h || v < 0 || 19 <= v)
 		return ;
 	
@@ -126,11 +125,8 @@ board_increase (board_t * board, int h, int v)
 void
 board_decrease (STATE s, board_t * board, int h, int v)
 {
-	printf("h=%d,v=%d",h,v) ;
 	board->point[v][h].state = s ;
-	printf("state %d\n", board->point[v][h].state) ;
 
-	fprintf(stderr,"state\n") ;
 	for (int i = 0; i < 8; i++)
 		r_board_decrease(board, h + board->dh[i], v + board->dv[i], i, 1, 0) ;
 }
