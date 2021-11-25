@@ -100,6 +100,8 @@ main ()
 			board_increase(away, h, v) ;
 			board_decrease(AWAY, home, h, v) ;
 			weight_decrease(AWAY, weight, h, v) ;
+
+			strtok(0x0, ":") ;
 		}
 
 		int hor1, ver1, hor2, ver2 ;
