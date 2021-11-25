@@ -58,16 +58,41 @@ board_t *
 board_new()
 {
 	board_t * board = (board_t *)malloc(sizeof(board_t)) ;
-
 	if (board == 0x0) {
-		perror("board_new()") ;
+		perror("board_new():board") ;
 		exit(1) ;
 	}
 	
+	board->point = (point_t **)malloc(sizeof(point_t *) * 19) ;
+	if(board->point == 0x0) {
+		perror("board_new():board->point") ;
+		exit(1) ;
+	}
+
+	
+	for (int i = 0; i < 19; i++) {
+		board->point[i] = (point_t *)malloc(sizeof(point_t) * 19) ;
+		if (board->point[i] == 0x0) {
+			perror("board_new():board->point[i]") ;
+			exit(1) ;
+		}
+	}
+
 	for (int i = 0; i < 19; i++)
 		for (int j = 0; j < 19; j++)
-			point_init(&(board->point[i][j]), 8) ;//board->point[i][j] = point_new(8) ;
-	
+			point_init(&(board->point[i][j]), 8) ;
+
+	board->dh = (int *)malloc(sizeof(int) * 8) ;
+	if (board->dh == 0x0) {
+		perror("board_new():board->dh") ;
+		exit(1) ;
+	}
+	board->dv = (int *)malloc(sizeof(int) * 8) ;
+	if (board->dh == 0x0) {
+		perror("board_new():board->dv") ;
+		exit(1) ;
+	}
+
 	int dh[8] = { 1, -1, 0, 0, 1, -1, 1, -1} ;
 	int dv[8] = { 0, 0, 1, -1, 1, 1, -1, -1} ;
 	

@@ -1,2 +1,2 @@
 all:
-	gcc src/*.c -ICONNSIX-c/include -Iinclude -LCONNSIX-c/lib -lconnsix
+	gcc src/*.c -g -ICONNSIX-c/include -Iinclude -LCONNSIX-c/lib -lconnsix

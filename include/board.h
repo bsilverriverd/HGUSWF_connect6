@@ -4,9 +4,9 @@
 #include "point.h"
 
 typedef struct _board {
-	point_t point[19][19] ;
-	int dh[8] ;
-	int dv[8] ;
+	point_t ** point ;
+	int * dh ;
+	int * dv ;
 } board_t ;
 
 board_t *

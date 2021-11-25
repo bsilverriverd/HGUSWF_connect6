@@ -68,6 +68,30 @@ weight_new()
 		for (int j = 0; j < 19; j++)
 			point_init(&(weight->point[i][j]), 4) ;//weight->point[i][j] = point_new(4) ;
 
+	weight->dh = (int **)malloc(sizeof(int *) * 2) ;
+	if (weight->dh == 0x0) {
+		perror("weight_new():weight->dh") ;
+		exit(1) ;
+	}
+	for (int i = 0; i < 2; i++) {
+		weight->dh[i] = (int *)malloc(sizeof(int) * 4) ;
+		if (weight->dh[i] == 0x0) {
+			perror("weight_new():weight->dh[i]") ;
+			exit(1) ;
+		}
+	}
+	weight->dh = (int **)malloc(sizeof(int *) * 2) ;
+	if (weight->dh == 0x0) {
+		perror("weight_new():weight->dh") ;
+		exit(1) ;
+	}
+	for (int i = 0; i < 2; i++) {
+		weight->dh[i] = (int *)malloc(sizeof(int) * 4) ;
+		if (weight->dh[i] == 0x0) {
+			perror("weight_new():weight->dh[i]") ;
+			exit(1) ;
+		}
+	}
 	int dh[2][4] = { { -1, 0, -1, 1 }, { 1, 0, 1, -1 } } ;
 	int dv[2][4] = { { 0, -1, -1, -1 }, { 0, 1, 1, 1 } } ; 
 	for (int i = 0; i < 2; i++) {
@@ -76,6 +100,26 @@ weight_new()
 			weight->dv[i][j] = dv[i][j] ;
 		}
 	}
+	
+	weight->point = (point_t **)malloc(sizeof(point_t *) * 19) ;
+	if(weight->point == 0x0) {
+		perror("weight_new():weight->point") ;
+		exit(1) ;
+	}
+
+	
+	for (int i = 0; i < 19; i++) {
+		weight->point[i] = (point_t *)malloc(sizeof(point_t) * 19) ;
+		if (weight->point[i] == 0x0) {
+			perror("weight_new():weight->point[i]") ;
+			exit(1) ;
+		}
+	}
+
+	for (int i = 0; i < 19; i++)
+		for (int j = 0; j < 19; j++)
+			point_init(&(weight->point[i][j]), 4) ;
+
 
 int initial_weight[4][19][19] = {
 	{
@@ -165,8 +209,10 @@ int initial_weight[4][19][19] = {
 } ;
 	for (int i = 0; i < 19; i++) {
 		for (int j = 0; j < 19; j++) {
-			for (int k = 0; k < 4; k++)
+			for (int k = 0; k < 4; k++) {
 				weight->point[i][j].count[k] = initial_weight[k][i][j] ;
+			}
+			printf("\n") ;
 		}
 	}
 	return weight ;

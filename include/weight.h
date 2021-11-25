@@ -4,9 +4,9 @@
 #include "point.h"
 
 typedef struct _weight {
-	point_t point[19][19] ;
-	int dh[2][4] ;
-	int dv[2][4] ;
+	point_t ** point ;
+	int ** dh ;
+	int ** dv ;
 } weight_t ;
 
 weight_t *

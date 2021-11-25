@@ -28,20 +28,24 @@ set_redstones (char * redstones)
 		printf("%d\n", RED) ;
 		board_decrease(RED, home, h, v) ;
 		board_decrease(RED, away, h, v) ;
-		weight_decrease(RED, weight, h, v) ;
+		//weight_decrease(RED, weight, h, v) ;
 	}
 }
 
 int
 main ()
 {
-	board_t * home = board_new() ;
-	board_t * away = board_new() ;
+	home = board_new() ;
+	away = board_new() ;
+	weight = weight_new() ;
 	
 	for (int i = 0; i < 8; i++)
 		printf("dh[%d]=%d\n", i, home->dh[i]) ;
 
-	weight_t * weight = weight_new() ;
+	int a, b ;
+	printf("home_max=%d\n", board_max(home, &a, &b)) ;
+	printf("away_max=%d\n", board_max(away, &a, &b)) ;
+	printf("weight_max=%d\n", weight_max(weight, &a, &b)) ;
 	
 	char ip[20] ;
 	int port = 0 ;
@@ -66,9 +70,9 @@ main ()
 
 	char * rbuf ;
 	if (strcmp(color, "black") == 0) {
-		board_increase(home, 10, 10) ;
-		board_decrease(AWAY, away, 10, 10) ;
-		weight_increase(weight, 10, 10) ;
+		board_increase(home, 9, 9) ;
+		board_decrease(AWAY, away, 9, 9) ;
+		weight_increase(weight, 9, 9) ;
 		rbuf = draw_and_read("K10") ;
 	} else {
 		rbuf = draw_and_read("") ;
