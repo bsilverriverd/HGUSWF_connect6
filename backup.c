@@ -4,7 +4,6 @@
 #include <time.h>
 
 #include "connsix.h"
-#include "board.h"
 
 char wbuf[10] ;	
 
