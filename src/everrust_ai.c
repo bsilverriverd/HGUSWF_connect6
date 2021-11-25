@@ -28,7 +28,9 @@ set_redstones (char * redstones)
 		printf("%d\n", RED) ;
 		board_decrease(RED, home, h, v) ;
 		board_decrease(RED, away, h, v) ;
-		//weight_decrease(RED, weight, h, v) ;
+		weight_decrease(RED, weight, h, v) ;
+
+		redstone = strtok(0x0, ":") ;
 	}
 }
 
