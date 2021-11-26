@@ -5,7 +5,7 @@
 #include "board.h"
 
 void
-r_board_increase (board_t * board, int h, int v, int dir, int depth)
+r_board_increase (board_t * board, int h, int v, int dir, int depth, int value)
 {
 	if (h < 0 || 19 <= h || v < 0 || 19 <= v)
 		return ;
@@ -15,9 +15,11 @@ r_board_increase (board_t * board, int h, int v, int dir, int depth)
 	
 	switch (board->point[v][h].state) {
 		case EMPTY :
-			board->point[v][h].count[dir] += 1 ;
+			board->point[v][h].count[dir] += (6-depth + value) ;
+			if (board->point[v][h].count[dir] >= 3) ;
+			board->point[v][h].count[dir] += 100 ;
 		case HOME :
-			r_board_increase(board, h + board->dh[dir], v + board->dv[dir], dir, depth + 1) ;
+			r_board_increase(board, h + board->dh[dir], v + board->dv[dir], dir, depth + 1, value + 1) ;
 			break ;
 		case AWAY :
 		case RED :
@@ -39,6 +41,8 @@ r_board_decrease (board_t * board, int h, int v, int dir, int depth, int weight)
 	switch (board->point[v][h].state) {
 		case EMPTY :
 			board->point[v][h].count[dir] = weight ;
+			if (weight >= 3)
+				board->point[v][h].count[dir] += 100 ;
 			r_board_decrease(board, h + board->dh[dir], v + board->dv[dir], dir, depth + 1, weight) ;
 			break ; 
 		case HOME :
@@ -119,7 +123,7 @@ board_increase (board_t * board, int h, int v)
 	board->point[v][h].state = HOME ;
 
 	for (int i = 0; i < 8; i++)
-		r_board_increase(board, h + board->dh[i], v + board->dv[i], i, 1) ;
+		r_board_increase(board, h + board->dh[i], v + board->dv[i], i, 1, 1) ;
 }
 
 void
@@ -149,4 +153,13 @@ board_max (board_t * board, int * h, int * v)
 		}
 	}
 	return max ;
+}
+
+int
+board_get_sum_at (board_t * board, int h, int v)
+{
+	if (board->point[v][h].state != EMPTY)
+		return 0 ;
+	else
+		return point_sum(&(board->point[h][v])) ;
 }

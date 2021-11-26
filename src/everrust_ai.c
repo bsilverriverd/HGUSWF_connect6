@@ -8,11 +8,71 @@
 #include "board.h"
 #include "weight.h"
 
-board_t * home ;
-board_t * away ;
-weight_t * weight ;
+board_t * home_board ;
+board_t * away_board ;
+weight_t * home_weight ;
+weight_t * away_weight ;
 
 char wbuf[10] ;	
+
+int
+can_win (board_t * board, int * h, int * v)
+{
+		for (int i = 0; i < 19; i++) {
+			for (int j = 0; j < 19; j++) {
+				if (board->point[i][j].state != EMPTY)
+					continue ;
+				for (int dir = 0; dir < 4; dir++) {
+				int sum = board->point[i][j].count[dir*2] + board->point[i][j].count[dir*2+1] ;
+				if (sum >= 4) {
+					*h = j ;
+					*v = i ;
+					return 1 ;
+				}
+			}
+		}
+	}
+	return 0 ;
+}
+
+int
+calculate (board_t * board, weight_t * weight, int * h, int * v)
+{
+	int max = 0 ;
+	for (int i = 0; i < 19; i++) {
+		for(int j = 0; j < 19; j++) {
+			int sum =  point_sum(&(board->point[i][j])) ;
+			sum += point_sum(&(weight->point[i][j])) ;
+			if (max < sum) {
+				max = sum ;
+				*h = j ;
+				*v = i ;
+			}
+		}
+	}
+	return max ;
+}
+
+int
+generate (board_t * hb, board_t * ab, weight_t * hw, weight_t * aw, int * h, int * v)
+{
+	int max = 0 ;
+	for (int i = 0; i < 19; i++) {
+		for (int j = 0; j < 19; j++) {
+			int sum = point_sum(&(hb->point[i][j])) ;
+			sum += point_sum(&(hw->point[i][j])) ;
+			sum += point_sum(&(ab->point[i][j])) ;
+			sum += point_sum(&(aw->point[i][j])) ;
+
+			if (max < sum) {
+				max = sum ;
+				*h = j ;
+				*v = i ;
+			}
+		}
+	}
+	return max ;
+}	
 
 void
 set_redstones (char * redstones)
@@ -26,9 +86,10 @@ set_redstones (char * redstones)
 		fprintf(stderr, "redstone %d %d\n", h, v) ;
 
 		printf("%d\n", RED) ;
-		board_decrease(RED, home, h, v) ;
-		board_decrease(RED, away, h, v) ;
-		weight_decrease(RED, weight, h, v) ;
+		board_decrease(RED, home_board, h, v) ;
+		board_decrease(RED, away_board, h, v) ;
+		weight_decrease(RED, home_weight, h, v) ;
+		weight_decrease(RED, away_weight, h, v) ;
 
 		redstone = strtok(0x0, ":") ;
 	}
@@ -37,17 +98,10 @@ set_redstones (char * redstones)
 int
 main ()
 {
-	home = board_new() ;
-	away = board_new() ;
-	weight = weight_new() ;
-	
-	for (int i = 0; i < 8; i++)
-		printf("dh[%d]=%d\n", i, home->dh[i]) ;
-
-	int a, b ;
-	printf("home_max=%d\n", board_max(home, &a, &b)) ;
-	printf("away_max=%d\n", board_max(away, &a, &b)) ;
-	printf("weight_max=%d\n", weight_max(weight, &a, &b)) ;
+	home_board = board_new() ;
+	away_board = board_new() ;
+	home_weight = weight_new() ;
+	away_weight = weight_new() ;
 	
 	char ip[20] ;
 	int port = 0 ;
@@ -68,13 +122,12 @@ main ()
 
 	set_redstones(redstones) ;
 
-
-
 	char * rbuf ;
 	if (strcmp(color, "black") == 0) {
-		board_increase(home, 9, 9) ;
-		board_decrease(AWAY, away, 9, 9) ;
-		weight_increase(weight, 9, 9) ;
+		board_increase(home_board, 9, 9) ;
+		weight_increase(home_weight, 9, 9) ;
+		board_decrease(AWAY, away_board, 9, 9) ;
+		weight_decrease(AWAY, away_weight, 9, 9) ;
 		rbuf = draw_and_read("K10") ;
 	} else {
 		rbuf = draw_and_read("") ;
@@ -97,36 +150,67 @@ main ()
 			int h = -1 ;
 			int v = -1 ;
 			parse_notation(tok, &h, &v) ;
-			board_increase(away, h, v) ;
-			board_decrease(AWAY, home, h, v) ;
-			weight_decrease(AWAY, weight, h, v) ;
+			board_increase(away_board, h, v) ;
+			weight_increase(away_weight, h, v) ;
+			board_decrease(AWAY, home_board, h, v) ;
+			weight_decrease(AWAY, home_weight, h, v) ;
 
 			tok = strtok(0x0, ":") ;
 		}
 
-		int hor1, ver1, hor2, ver2 ;
+		int hor[2], ver[2] ;
+/*
+		if (can_win(home_board, &hor[0], &ver[0]) == 1) {
+			board_increase(home_board, hor[0], ver[0]) ;
+			weight_increase(home_weight, hor[0], ver[0]) ;
+			board_decrease(AWAY, away_board, hor[0], ver[0]) ;
+			weight_decrease(AWAY, away_weight, hor[0], ver[0]) ;
+			
+			if (can_win(home_board, &hor[1], &hor[1]) == 1) {
+			board_increase(home_board, hor[1], ver[1]) ;
+			weight_increase(home_weight, hor[1], ver[1]) ;
+			board_decrease(AWAY, away_board, hor[1], ver[1]) ;
+			weight_decrease(AWAY, away_weight, hor[1], ver[1]) ;
 
-		weight_max(weight, &hor1, &ver1) ;
-		board_increase(home, hor1, ver1) ;
-		board_decrease(AWAY, away, hor1, ver1) ;
-		weight_increase(weight, hor1, ver1) ;
+			} else {
+				calculate(away_board, away_weight, &hor[1], &ver[1]) ;
+			board_increase(home_board, hor[1], ver[1]) ;
+			weight_increase(home_weight, hor[1], ver[1]) ;
+			board_decrease(AWAY, away_board, hor[1], ver[1]) ;
+			weight_decrease(AWAY, away_weight, hor[1], ver[1]) ;
 
-		weight_max(weight, &hor2, &ver2) ;
-		board_increase(home, hor2, ver2) ;
-		board_decrease(AWAY, away, hor2, ver2) ;
-		weight_increase(weight, hor2, ver2) ;
+			}
+		} else {*/
+		for (int i = 0; i < 2; i++) {
+			calculate(away_board, away_weight, &hor[i], &ver[i]) ;
+			/*
+			int home_h, home_v, away_h, away_v ;
 
-		compose_notation(wbuf, hor1, ver1, hor2, ver2) ;
-		
+			int home_sum = calculate(home_board, home_weight, &home_h, &home_v) ;
+			int away_sum = calculate(away_board, away_weight, &away_h, &away_v) ;
+
+			if (away_sum < home_sum) {
+				hor[i] = home_h ;
+				ver[i] = home_v ;
+			} else {
+				hor[i] = away_h ;
+				ver[i] = away_v ;
+			}
+			*/
+			/*
+			generate(home_board, away_board, home_weight, away_weight, &hor[i], &ver[i]) ;
+			*/
+			board_increase(home_board, hor[i], ver[i]) ;
+			weight_increase(home_weight, hor[i], ver[i]) ;
+			board_decrease(AWAY, away_board, hor[i], ver[i]) ;
+			weight_decrease(AWAY, away_weight, hor[i], ver[i]) ;
+		}
+		compose_notation(wbuf, hor[0], ver[0], hor[1], ver[1]) ;
 		draw_and_read(wbuf) ;
 		
 	}
 
 	printf("Game Over. You %s!\n", rbuf) ;
-	
-	board_delete(home) ;
-	board_delete(away) ;
-	weight_delete(weight) ;
 
 	return 0 ;
 }

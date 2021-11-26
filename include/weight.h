@@ -23,6 +23,9 @@ weight_decrease (STATE s, weight_t * weight, int h, int v) ;
 
 int
 weight_max (weight_t * weight, int * h, int  * v) ;
+
+int
+weight_get_sum_at (weight_t * weight, int h, int v) ;
 /*
 int initial_weight[4][19][19] = {
 	{

@@ -4,27 +4,33 @@
 
 #include "weight.h"
 
-void
-r_weight_increase (weight_t * weight, int h, int v, int i, int j, int depth)
+int
+r_weight_increase (weight_t * weight, int h, int v, int i, int j, int depth, int value)
 {
 	if (h < 0 || 19 <= h || v < 0 || 19 <= v)
-		return ;
+		return value ;
 	
 	if (depth == 6)
-		return ;
+		return value ;
 	
+	int ret = value ;
 	switch (weight->point[v][h].state) {
 		case EMPTY :
-			weight->point[v][h].count[i] += 1 ;
+			ret =  r_weight_increase(weight, h + weight->dh[j][i], v + weight->dv[j][i], i, j, depth + 1, value) ;
+			weight->point[v][h].count[i] += (6-depth + ret) ;
+			ret += 1 ;
+			break ;
 		case HOME :
-			r_weight_increase (weight, h + weight->dh[j][i], v + weight->dv[j][i], i, j, depth + 1) ;
+			ret = r_weight_increase (weight, h + weight->dh[j][i], v + weight->dv[j][i], i, j, depth + 1, value + 1) ;
+			weight->point[v][h].count[i] += (6-depth + ret) ;
+			ret += 1 ;
 			break ;
 		case AWAY :
 		case RED :
 		default :
 			break ;
 	}
-	return ;
+	return ret ;
 }
 
 int
@@ -230,7 +236,7 @@ weight_increase (weight_t * weight, int h, int v)
 
 	for (int j = 0; j < 2; j++)
 		for (int i = 0; i < 4; i++)
-			r_weight_increase(weight, h + weight->dh[j][i], v + weight->dv[j][i], i, j, 1) ;
+			r_weight_increase(weight, h + weight->dh[j][i], v + weight->dv[j][i], i, j, 1, weight->point[v][h].count[i]) ;
 }
 
 void

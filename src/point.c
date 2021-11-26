@@ -48,6 +48,9 @@ point_delete (point_t * point)
 int
 point_sum (point_t * point)
 {
+	if (point->state != EMPTY)
+		return 0 ;
+
 	int sum = 0 ;
 	for (int i = 0; i < point->size; i++)
 		sum += point->count[i] ;

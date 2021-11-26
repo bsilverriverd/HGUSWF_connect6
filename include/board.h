@@ -24,4 +24,6 @@ board_decrease (STATE s, board_t * board, int h, int v) ;
 int
 board_max (board_t * board, int * h, int * v) ;
 
+int board_get_sum_at (board_t * board, int h, int v) ;
+
 //#endif
